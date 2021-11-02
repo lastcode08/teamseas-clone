@@ -1,16 +1,23 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloServerPluginLandingPageLocalDefault as pluginLanding } from 'apollo-server-core';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-
+import { GraphQLDateTime } from 'graphql-iso-date';
+import { DonationsModule } from './donations/donations.module';
 @Module({
   imports: [
     GraphQLModule.forRoot({
       playground: false,
-      plugins: [pluginLanding()],
-      typePaths: ['./**/*.graphql']
-    })
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      typePaths: ['./**/*.graphql'],
+      resolvers: { DateTime: GraphQLDateTime },
+      subscriptions: {
+        'subscriptions-transport-ws': true,
+        'graphql-ws': true,
+      },
+    }),
+    DonationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
