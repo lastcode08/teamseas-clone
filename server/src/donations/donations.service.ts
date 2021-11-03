@@ -2,8 +2,8 @@ import { Prisma } from '.prisma/client';
 import { Injectable } from '@nestjs/common';
 import { PubSub } from 'graphql-subscriptions';
 import { PrismaService } from 'src/common/services/prisma.service';
-import { OrderByParams } from 'src/graphql';
 import { CreateDonationInput } from './dto/create-donation.input';
+import { QueriesDonationsDto } from './dto/queries-donations.dto';
 
 const pubSub = new PubSub();
 
@@ -23,14 +23,26 @@ export class DonationsService {
     return result;
   }
 
-  findAll(orderBy?: OrderByParams) {
-    const { field = 'createdAt', direction = 'desc' } = orderBy || {};
+  async findAll(queries?: QueriesDonationsDto) {
+    const { field = 'createdAt', direction = 'desc', cursor } = queries || {};
 
-    return this.db.donation.findMany({
+    const options = {
+      skip: cursor ? 1 : 0,
+      take: 5,
+      cursor: cursor ? { id: cursor } : undefined,
+    };
+
+    const result = await this.db.donation.findMany({
+      ...options,
       orderBy: {
         [field]: direction,
       },
     });
+
+    return {
+      donations: result,
+      cursor: result.length > 0 ? result[result.length - 1].id : null,
+    };
   }
 
   findOne(uniqueInput: Prisma.DonationWhereUniqueInput) {

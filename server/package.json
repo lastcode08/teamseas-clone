@@ -12,7 +12,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "dev": "concurrently \"npm:start:dev\" \"npm:gen\" \"npm:prisma:generate\"",
+    "dev": "concurrently \"npm:start:dev\" \"npm:gen\" \"npx:prisma:generate\"",
     "start:dev": "nest start --watch",
     "gen": "ts-node ./src/generate-typings",
     "start:debug": "nest start --debug --watch",

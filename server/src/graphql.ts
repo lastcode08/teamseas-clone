@@ -17,9 +17,10 @@ export class CreateDonationInput {
     createdAt?: Nullable<DateTime>;
 }
 
-export class OrderByParams {
+export class DonationQueries {
     field?: Nullable<string>;
     direction?: Nullable<string>;
+    cursor?: Nullable<string>;
 }
 
 export class Donation {
@@ -34,7 +35,7 @@ export class Donation {
 }
 
 export abstract class IQuery {
-    abstract donations(orderBy?: Nullable<OrderByParams>): Nullable<Donation>[] | Promise<Nullable<Donation>[]>;
+    abstract donations(queries?: Nullable<DonationQueries>): Nullable<DonationQueryResult> | Promise<Nullable<DonationQueryResult>>;
 
     abstract donation(id: string): Nullable<Donation> | Promise<Nullable<Donation>>;
 
@@ -43,6 +44,11 @@ export abstract class IQuery {
 
 export abstract class IMutation {
     abstract createDonation(createDonationInput: CreateDonationInput): Donation | Promise<Donation>;
+}
+
+export class DonationQueryResult {
+    donations?: Nullable<Nullable<Donation>[]>;
+    cursor?: Nullable<string>;
 }
 
 export class Result {

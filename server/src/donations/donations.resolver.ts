@@ -1,8 +1,9 @@
 import { Donation } from '.prisma/client';
-import { Resolver, Query, Mutation, Args, Subscription } from '@nestjs/graphql';
-import { OrderByParams } from 'src/graphql';
+import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import { DonationQueryResult } from 'src/graphql';
 import { DonationsService } from './donations.service';
 import { CreateDonationInput } from './dto/create-donation.input';
+import { QueriesDonationsDto } from './dto/queries-donations.dto';
 
 @Resolver('Donation')
 export class DonationsResolver {
@@ -16,8 +17,11 @@ export class DonationsResolver {
   }
 
   @Query('donations')
-  findAll(@Args('orderBy') orderBy?: OrderByParams): Promise<Donation[]> {
-    return this.donationsService.findAll(orderBy);
+  findAll(
+    @Args('queries')
+    queries: QueriesDonationsDto,
+  ): Promise<DonationQueryResult> {
+    return this.donationsService.findAll(queries);
   }
 
   @Query('donation')

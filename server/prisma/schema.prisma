@@ -19,4 +19,6 @@ model Donation {
   message     String?
   team        String?
   createdAt   DateTime @default(now())
+
+  @@map("donations")
 }
