@@ -47,16 +47,16 @@ export abstract class IMutation {
 }
 
 export class DonationQueryResult {
-    donations?: Nullable<Nullable<Donation>[]>;
+    items?: Nullable<Nullable<Donation>[]>;
     cursor?: Nullable<string>;
 }
 
-export class Result {
+export class SubscriptionTotalUpdatedResult {
     total: number;
 }
 
 export abstract class ISubscription {
-    abstract totalUpdated(): Nullable<Result> | Promise<Nullable<Result>>;
+    abstract totalUpdated(): Nullable<SubscriptionTotalUpdatedResult> | Promise<Nullable<SubscriptionTotalUpdatedResult>>;
 }
 
 export type DateTime = any;

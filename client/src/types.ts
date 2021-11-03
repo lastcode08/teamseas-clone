@@ -7,3 +7,8 @@ export interface IDonation {
   message?: string;
   createdAt: string;
 }
+
+export interface IPaginateCursor<T> {
+  items: T[];
+  cursor: string;
+}

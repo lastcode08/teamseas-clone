@@ -38,14 +38,14 @@ type Mutation {
 }
 
 type DonationQueryResult {
-  donations: [Donation]
+  items: [Donation]
   cursor: ID
 }
 
-type Result {
+type SubscriptionTotalUpdatedResult {
   total: Int!
 }
 
 type Subscription {
-  totalUpdated: Result
+  totalUpdated: SubscriptionTotalUpdatedResult
 }

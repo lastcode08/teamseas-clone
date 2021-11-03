@@ -1,12 +1,12 @@
 import { animate, motion } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 interface CounterProps {
   from: number;
   to: number;
 }
 
-export function Counter({ from, to }: CounterProps) {
+export const Counter = memo(({ from, to }: CounterProps) => {
   const nodeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,4 +25,4 @@ export function Counter({ from, to }: CounterProps) {
   }, [from, to]);
 
   return <motion.div ref={nodeRef} />;
-}
+});

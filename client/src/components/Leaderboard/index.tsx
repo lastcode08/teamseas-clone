@@ -1,59 +1,60 @@
-import { Card, Divider, List, Skeleton, Typography } from "antd";
-import React, { useEffect, useState } from "react";
+import { useQuery } from "@apollo/client";
+import { Alert, Card, Divider, List, Radio, Skeleton, Typography } from "antd";
+import { memo, useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useQuery } from "urql";
 import { donationsQUery } from "../../graphql/queries";
-import { IDonation } from "../../types";
+import { IDonation, IPaginateCursor } from "../../types";
 import { LeaderboardItem } from "./LeaderboardItem";
 
 interface ILeaderBoardProps {}
 
 interface ILeaderboardState {
-  data: IDonation[];
   field: string;
+  direction: string;
 }
 
-type donationsQueryResult = {
-  donations: IDonation[];
-  totalDonations: number;
-};
-
-export const Leaderboard = (props: ILeaderBoardProps) => {
+export const Leaderboard = memo((props: ILeaderBoardProps) => {
   const [state, setState] = useState<ILeaderboardState>({
     field: "createdAt",
-    data: [],
+    direction: "desc",
   });
 
-  const [{ data, fetching, error }] = useQuery<donationsQueryResult>({
-    query: donationsQUery,
+  const { data, loading, error, fetchMore, refetch } = useQuery<{
+    donations: IPaginateCursor<IDonation>;
+  }>(donationsQUery, {
     variables: {
-      orderBy: {
+      queries: {
         field: state.field,
-        direction: "desc",
+        direction: state.direction,
+        cursor: null,
       },
     },
   });
 
-  const loadMoreData = () => {
-    if (fetching) {
-      return;
-    }
+  const loadMoreData = async () => {
+    const cursor = data?.donations.cursor;
 
-    fetch(
-      "https://randomuser.me/api/?results=10&inc=name,gender,email,nat,picture&noinfo"
-    )
-      .then((res) => res.json())
-      .then(() => {
-        setState({ ...state });
-      })
-      .catch(() => {
-        setState({ ...state });
+    if (cursor) {
+      const { field, direction } = state;
+      await fetchMore({
+        variables: {
+          queries: {
+            field,
+            direction,
+            cursor,
+          },
+        },
       });
+    }
   };
 
-  useEffect(() => loadMoreData(), []);
+  useEffect(() => {
+    (async () => {
+      await refetch();
+    })();
+  }, [state.field]);
 
-  const { data: donations } = state;
+  console.log(state.field);
 
   return (
     <Card
@@ -64,39 +65,54 @@ export const Leaderboard = (props: ILeaderBoardProps) => {
         padding: 0,
       }}
     >
-      <h1>{data?.donations.length}</h1>
-
+      <Radio.Group
+        defaultValue="createdAt"
+        buttonStyle="solid"
+        onChange={(e) => setState({ ...state, field: e.target.value })}
+      >
+        <Radio value="createdAt">Most Recent</Radio>
+        <Radio value="count">Most Pounds</Radio>
+      </Radio.Group>
+      <br />
       <Card
         bordered={false}
         id="scrollableDiv"
         style={{
           height: 280,
           overflow: "auto",
-          padding: "0 50px",
+          padding: "0 40px",
           margin: "auto",
+          marginTop: 20,
         }}
       >
         <InfiniteScroll
-          dataLength={data?.donations.length || 0}
+          dataLength={data?.donations.items.length || 0}
           next={loadMoreData}
-          // hasMore={(data?.donations.length || 0) < 50}
-          hasMore={false}
+          hasMore={data?.donations.cursor ? true : false}
           loader={<Skeleton avatar paragraph={{ rows: 1 }} active />}
           endMessage={<Divider plain>It is all, nothing more 🤐</Divider>}
           scrollableTarget="scrollableDiv"
         >
-          {error ? (
-            <p>Something went wrong...</p>
-          ) : fetching || !data ? (
-            <Skeleton />
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <Alert
+              style={{ textAlign: "left" }}
+              message="Oopsss 🤐"
+              description="Something went wrong when trying to get the leaderboard data"
+              type="error"
+              showIcon
+            />
           ) : (
             <List
-              dataSource={data?.donations}
-              renderItem={(item) => <LeaderboardItem donation={item} />}
+              dataSource={data?.donations.items}
+              renderItem={(item: IDonation) => (
+                <LeaderboardItem donation={item} />
+              )}
             />
           )}
         </InfiniteScroll>
       </Card>
     </Card>
   );
-};
+});

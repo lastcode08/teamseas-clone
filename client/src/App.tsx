@@ -1,5 +1,5 @@
+import { useQuery, useSubscription } from "@apollo/client";
 import { Col, Image, Layout, Row, Spin, Typography } from "antd";
-import { useQuery, useSubscription } from "urql";
 import "./App.css";
 import { Counter } from "./components/Counter";
 import { Leaderboard } from "./components/Leaderboard";
@@ -9,13 +9,10 @@ import { totalUpdatedSubscription } from "./graphql/subscriptions";
 const { Title } = Typography;
 
 function App() {
-  const [{ data, fetching }] = useQuery({
-    query: totalDonationQuery,
-  });
+  const { loading, error, data } = useQuery(totalDonationQuery);
 
-  const [totalUpdateSubscriptionResponse] = useSubscription(
-    { query: totalUpdatedSubscription },
-    (prev: any, result: any) => result?.totalUpdated?.total
+  const { data: totalUpdatedSubscriptionResponse } = useSubscription(
+    totalUpdatedSubscription
   );
 
   return (
@@ -35,12 +32,15 @@ function App() {
           </Title>
 
           <Title>
-            {fetching ? (
+            {loading ? (
               <Spin />
             ) : (
               <Counter
                 from={0}
-                to={totalUpdateSubscriptionResponse.data || data.totalDonations}
+                to={
+                  totalUpdatedSubscriptionResponse?.totalUpdated?.total ||
+                  data.totalDonations
+                }
               />
             )}
           </Title>

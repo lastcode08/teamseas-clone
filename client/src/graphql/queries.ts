@@ -1,21 +1,25 @@
-export const totalDonationQuery = `
+import { gql } from "@apollo/client";
+
+export const totalDonationQuery = gql`
   query Query {
     totalDonations
   }
 `;
 
-export const donationsQUery = `
-query Query($orderBy: OrderByParams) {
-  donations(orderBy: $orderBy) {
-    id
-    count
-    email
-    displayName
-    mobile
-    team
-    message
-    createdAt
+export const donationsQUery = gql`
+  query Query($queries: DonationQueries) {
+    donations(queries: $queries) {
+      items {
+        id
+        count
+        displayName
+        team
+        mobile
+        email
+        createdAt
+        message
+      }
+      cursor
+    }
   }
-  totalDonations
-}
 `;

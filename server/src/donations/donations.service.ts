@@ -40,7 +40,7 @@ export class DonationsService {
     });
 
     return {
-      donations: result,
+      items: result,
       cursor: result.length > 0 ? result[result.length - 1].id : null,
     };
   }

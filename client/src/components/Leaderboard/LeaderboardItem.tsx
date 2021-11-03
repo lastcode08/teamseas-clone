@@ -1,4 +1,4 @@
-import { Avatar, List, Tag } from "antd";
+import { Avatar, List, Space, Tag, Typography } from "antd";
 import { IDonation } from "../../types";
 
 interface ILeaderboardItemProps {
@@ -9,26 +9,35 @@ export function LeaderboardItem(props: ILeaderboardItemProps) {
   const { donation } = props;
 
   return (
-    <List.Item key={donation.id}>
+    <List.Item
+      key={donation.id}
+      extra={
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Tag style={{ marginRight: 0, marginBottom: 10 }} color="success">
+            <b>{donation.count} pounds</b>
+          </Tag>
+          <small>{new Date(donation.createdAt).toLocaleString()}</small>
+        </div>
+      }
+    >
       <List.Item.Meta
         style={{ textAlign: "left" }}
-        avatar={
-          <Avatar src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png" />
+        avatar={<Avatar src={`https://i.pravatar.cc/50?u=${donation.email}`} />}
+        title={
+          <Space direction="vertical">
+            <Tag color="warning">#{donation.team || "no-team"}</Tag>
+            <Typography.Text strong style={{ fontSize: 16 }}>
+              {donation.displayName}
+            </Typography.Text>
+          </Space>
         }
-        title={<>{donation.displayName}</>}
         description={donation?.message}
       />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Tag style={{ marginRight: 0, marginBottom: 10 }} color="success">
-          <b>{donation.count} pounds</b>
-        </Tag>
-        <small>10/29/2021, 10:31 AM</small>
-      </div>
     </List.Item>
   );
 }
